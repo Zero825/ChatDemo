@@ -7,4 +7,6 @@
 
 使用框架 SpringBoot+SpringMVC+mybatis+ajax+javascript+jQuery+html+css/n
 
-数据库文件 在文件夹lib/mysql里面
+数据库脚本文件 在文件夹lib/mysql里面
+
+Http服务器用python创建 bat脚本在lib/python里面 要先在服务器C盘根目录下创建file文件夹，在此文件夹下创建userfiles和userimages文件夹。
