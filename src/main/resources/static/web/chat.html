@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/chat.css">
+    <title>129聊天空间</title>
+    <link rel="icon" href="/images/icon.ico" sizes="any">
+    <!--the css for jquery.mCustomScrollbar-->
+    <link rel="stylesheet" href="/css/jquery.mCustomScrollbar.min.css"/>
+    <!--the css for this plugin-->
+    <link rel="stylesheet" href="/css/jquery.emoji.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/webuploader.css">
+</head>
+
+<script src="/js/jquery-3.4.1.min.js" language="javascript"></script>
+<!--(Optional) the js for jquery.mCustomScrollbar's addon-->
+<script src="/js/jquery.mousewheel-3.0.6.min.js"></script>
+<!--the js for jquery.mCustomScrollbar-->
+<script src="/js/jquery.mCustomScrollbar.min.js"></script>
+<!--the js for this plugin-->
+<script src="/js/jquery.emoji.js"></script>
+<script type="text/javascript" src="/js/webuploader.js"></script>
+<script type="text/JavaScript">
+      var username=null;
+      var websocket = null;
+      var userlist=new Array();
+
+
+      //加载js
+      function on_load() {
+        // 初始化Web Uploader
+        var uploader = WebUploader.create({
+
+            // 选完文件后，是否自动上传。
+            auto: true,
+
+            // swf文件路径
+            swf:'/js/Uploader.swf',
+
+            // 文件接收服务端。
+            server: '/imagesupload',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#btn2',
+
+            // 只允许选择图片文件。
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }
+        });
+        // 文件上传成功
+        uploader.on( 'uploadSuccess', function( file ) {
+            console.log(file.name);
+            var toUser = document.getElementById('msgtitle').innerHTML;
+            var socketMsg = {fromUser:username,toUser:toUser,image:file.name};
+            if(toUser==''||toUser=="群聊空间"){
+                socketMsg.type=0;
+            }else{
+                socketMsg.type=1;
+            }
+            websocket.send(JSON.stringify(socketMsg));
+            uploader.reset();
+        });
+
+        // 文件上传失败，显示上传出错
+        uploader.on( 'uploadError', function( file ) {
+            console.log('no u');
+        });
+
+        // 初始化Web Uploader
+        var uploader1 = WebUploader.create({
+
+            // 选完文件后，是否自动上传。
+            auto: true,
+
+            // swf文件路径
+            swf:'/js/Uploader.swf',
+
+            // 文件接收服务端。
+            server: '/fileupload',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#btn3',
+
+        });
+        // 文件上传成功
+        uploader1.on( 'uploadSuccess', function( file ) {
+            console.log(file.name);
+            var toUser = document.getElementById('msgtitle').innerHTML;
+            var socketMsg = {fromUser:username,toUser:toUser,file:file.name};
+            if(toUser==''||toUser=="群聊空间"){
+                socketMsg.type=0;
+            }else{
+                socketMsg.type=1;
+            }
+            websocket.send(JSON.stringify(socketMsg));
+            uploader1.reset();
+        });
+
+        // 文件上传失败，显示上传出错
+        uploader1.on( 'uploadError', function( file ) {
+            console.log('no u');
+        });
+
+
+
+
+
+        $("#text").emoji({
+            button: '#btn1',
+            position: 'topRight',
+            showTab: true,
+            animation: 'fade',
+            icons: [{
+                name: "贴吧表情",
+                path: "/images/tieba/",
+                maxNum: 50,
+                file: ".jpg",
+                placeholder: "#teiba_{alias}#"
+            },{
+                name: "QQ高清",
+                path: "/images/qq/",
+                maxNum: 91,
+                excludeNums: [41, 45, 54],
+                file: ".gif",
+                placeholder: "#qq_{alias}#"
+            }, {
+                name: "emoji高清",
+                path: "/images/emoji/",
+                maxNum: 84,
+                file: ".png",
+                placeholder: "#emoji_{alias}#"
+            }]
+        });
+
+        $.ajax({
+
+             	type : "POST",
+             	url  : "/checkLogin1",
+             	success : function(data){
+             	    if(data=="404"){
+                        alert("请先登录！");
+                        location.href="index.html";
+             		}
+             		else{
+             		    console.log(data);
+             		    username=data;
+             		    console.log(username);
+             		    document.getElementById("name").innerHTML ="当前用户:"+data;
+             		    conectWebSocket();
+             		}
+             	}
+             });
+      }
+      //随机颜色
+      function getrand(m,n){
+            return rand=Math.floor(Math.random()*(n-m+1))+m
+	  }
+      function rgbr(){
+            var myColor=new Array();
+            myColor[0]="#F44336";
+            myColor[1]="#3F51B5";
+            myColor[2]="#4CAF50";
+            myColor[3]="#2196F3";
+            myColor[4]="#8BC34A";
+            myColor[5]="#03A9F4";
+            myColor[6]="#CDDC39";
+            myColor[7]="#673AB7";
+            var temp1=getrand(0,7);
+            console.log(temp);
+            var temp=myColor[getrand(0,7)];
+            console.log(temp);
+            return temp;
+      }
+
+      function conectWebSocket(){
+
+              //判断当前浏览器是否支持WebSocket
+              if('WebSocket' in window){
+                  console.log(username);
+                  websocket = new WebSocket("ws://localhost:80/web/chat/"+username);
+              }
+              else{
+                  alert('Not support websocket');
+              }
+              //连接发生错误的回调方法
+              websocket.onerror = function(){
+                    console.log('no c');
+              };
+              //连接成功建立的回调方法
+              websocket.onopen = function(event){
+                    console.log('yes c');
+
+              };
+              //接收到消息的回调方法
+              websocket.onmessage = function(event){
+                    console.log(event);
+
+                    var obj = JSON.parse(event.data);
+                    if(obj.type==2){
+                        document.getElementById('userlist').innerHTML='';
+                        console.log(obj);
+                        for(var i=0;i<obj.msg.length;i++){
+                            setListInnerHTML(obj.msg[i],i);
+                            if(userlist!=null){
+                                var k=0;
+                                for(var j=0;j<userlist.length;j++){
+                                    if(userlist[j]==obj.msg[i]){
+                                        k=1;
+                                    }
+                                }
+                                if(k==0){
+                                    document.getElementById('msglist').innerHTML +="<div id='messages"+obj.msg[i]+"' class='msgbox' style='display:none'></div>";
+                                }
+                            }
+                            userlist[i]=obj.msg[i];
+                        }
+                    }else{
+                        if(obj.fromUser==username){
+                        setMyMessageInnerHTML(obj);
+                        }
+                        else setMessageInnerHTML(obj);
+                    }
+              };
+              //连接关闭的回调方法
+              websocket.onclose = function(){
+                    console.log('c c');
+              };
+      }
+      //显示消息
+      function setMessageInnerHTML(obj) {
+        var temp=obj.fromUser;
+        if(obj.toUser=="群聊空间") temp='';
+        var temp1='messages'+temp;
+        var div = document.getElementById(temp1);
+        if(obj.file!=null){
+            console.log(obj.file);
+            var f1="<div class='file'>"+"<img width='30' heigth='30' src='/images/nana.png' />"+"<a style='text-decoration:none;' href='http://localhost:1320/userfiles/"+obj.file+"'>"+obj.file+"</a>"+'<br/>';
+            document.getElementById(temp1).innerHTML +="<div class='css7'>"+"<input type='button' value="+obj.fromUser.substr(0, 1)+" class='listbtn1'>" +"</div>"+f1;
+        }
+        else if(obj.image!=null){
+            console.log(obj.image);
+            var i1="<div class='image'>"+"<img style='border-radius: 5px;' width='300' src='http://localhost:1320/userimages/"+obj.image+"' />"+'<br/>';
+            document.getElementById(temp1).innerHTML +="<div class='css7'>"+"<input type='button' value="+obj.fromUser.substr(0, 1)+" class='listbtn1'>" +"</div>"+i1;
+        }else{
+
+          var s1="<div class='text'>"+String(obj.msg).replace(/[\r\n]/g, '<br/>')+'<br/>';
+
+          console.log(temp1);
+          document.getElementById(temp1).innerHTML +="<div class='css7'>"+"<input type='button' value="+obj.fromUser.substr(0, 1)+" class='listbtn1'>" +"</div>"+s1;
+
+        }
+          console.log(div.scrollTop);
+          div.scrollTop=9999;
+      }
+      //显示我的消息
+      function setMyMessageInnerHTML(obj) {
+        var temp=obj.toUser;
+        if(obj.toUser=="群聊空间") temp='';
+        var temp1='messages'+temp;
+        if(obj.file!=null){
+            console.log(obj.file);
+            var f1="<div class='file1'>"+"<img width='30' heigth='30' src='/images/nana.png' />"+"<a style='text-decoration:none;' href='http://localhost:1320/userfiles/"+obj.file+"'>"+obj.file+"</a>"+'<br/>';
+            document.getElementById(temp1).innerHTML +="<div class='css6'>"+"<input type='button' value="+obj.fromUser.substr(0, 1)+" class='listbtn1'>" +"</div>"+f1;
+        }else if(obj.image!=null){
+            console.log(obj.image);
+            var i1="<div class='image1'>"+"<img style='border-radius: 5px;' width='300' src='http://localhost:1320/userimages/"+obj.image+"' />"+'<br/>';
+            document.getElementById(temp1).innerHTML +="<div class='css6'>"+"<input type='button' value="+obj.fromUser.substr(0, 1)+" class='listbtn1'>" +"</div>"+i1;
+        }else{
+
+          var s1="<div class='text1'>"+String(obj.msg).replace(/[\r\n]/g, '<br/>')+'<br/>';
+
+          document.getElementById(temp1).innerHTML +="<div class='css6'>"+"<input type='button' value="+obj.fromUser.substr(0, 1)+" class='listbtn1'>" +"</div>"+s1;
+
+        }
+        var div = document.getElementById(temp1);
+        console.log(div.scrollTop);
+        div.scrollTop=9999;
+      }
+      //刷新用户列表
+      function setListInnerHTML(msg,i) {
+          document.getElementById('userlist').innerHTML +="<div id='bs"+i+"' onclick='showMsgBox(this)'>"+"<input id='b"+i+"' type='button' value="+msg.substr(0, 1)+" class='listbtn'>" +msg+'<br/>'+"</div>";
+          if(msg==username){
+              var temp="bs"+i;
+              document.getElementById(temp).style.display="none";
+          }
+      }
+      //发送消息
+      function send(){
+        var message = document.getElementById('text').innerHTML;
+        var toUser = document.getElementById('msgtitle').innerHTML;
+        var socketMsg = {msg:message,fromUser:username,toUser:toUser};
+        if(toUser==''||toUser=="群聊空间"){
+            socketMsg.type=0;
+        }else{
+            socketMsg.type=1;
+        }
+        websocket.send(JSON.stringify(socketMsg));
+        document.getElementById('text').innerHTML='';
+      }
+      //私聊框
+      function showMsgBox(obj){
+        if(!(userlist[obj.id.substr(2)]==username)){
+            document.getElementById('messages').style.display="none";
+            document.getElementById('bs').className="nc";
+            for(var i=0;i<userlist.length;i++){
+                var temp="messages"+userlist[i];
+                if(document.getElementById(temp)!=null)
+                document.getElementById(temp).style.display="none";
+                var temp1="bs"+i;
+                if(document.getElementById(temp1)!=null)
+                document.getElementById(temp1).className="nc";
+            }
+            var temp=userlist[obj.id.substr(2)];
+            document.getElementById('msgtitle').innerHTML =temp;
+            var temp1="messages"+temp;
+            var temp2="bs"+obj.id.substr(2);
+            document.getElementById(temp1).style.display="block";
+            document.getElementById(temp2).className="sc";
+        }
+      }
+      function wechat(){
+        document.getElementById('msgtitle').innerHTML ="群聊空间";
+        for(var i=0;i<userlist.length;i++){
+            var temp="messages"+userlist[i];
+            if(document.getElementById(temp)!=null)
+            document.getElementById(temp).style.display="none";
+            var temp1="bs"+i;
+            if(document.getElementById(temp1)!=null)
+            document.getElementById(temp1).className="nc";
+        }
+        document.getElementById('messages').style.display="block";
+        document.getElementById('bs').className="stc";
+      }
+ </script>
+
+<body background="/images/th.jpg" onload="on_load()">
+<div class="container"><!--该层主要用于设定毛玻璃位置以及对毛玻璃的溢出进行限制，即作为毛玻璃的容器-->
+    <div class="glass"></div><!--该层用于模糊化-->
+    <div class="chatcss1">
+        <div class="cs1">
+            <label class="topleft">129聊天空间</label>
+            <label id="name" class="topright"></label>
+        </div>
+
+        <div class="cs5">
+
+            <div class="cs2">
+                <div id="bs" onclick="wechat()" class="stc">
+                    <input type="button" value="群" class="listbtn">
+                    群聊空间
+                </div>
+                <div id="userlist" class="listbox" style="overflow:auto">
+
+                </div>
+            </div>
+
+            <div id="msglist" class="cs3">
+                <div id="msgtitle" style="text-align:center;font-size:20px;">群聊空间</div>
+                <div id="messages" class="msgbox"></div>
+                <button id="btn1" class="lookp"></button>
+
+            </div>
+            <div class="cs4">
+                <div id="text" class="textbox" contenteditable="true" placeholder="请输入要发送的内容"></div>
+                <button id="send" onclick="send()" class="sendbtn">发送消息</button>
+            </div>
+        </div>
+    </div>
+    <div id="btn2" class="uploadp"></div>
+    <div id="btn3" class="uploadf"></div>
+</div>
+
+
+
+
+
+
+
+</body>
+
+</html>

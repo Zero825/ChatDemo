@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/log.css">
+    <title>129聊天空间</title>
+    <link rel="icon" href="/images/icon1.ico" sizes="any">
+</head>
+
+<script src="/js/jquery-3.4.1.min.js" language="javascript"></script>
+<script type="text/javascript">
+    function doLogin(){
+         var name = $("#username").val();
+            var password = $("#password").val();
+            console.log(name);
+            if(name == ""){
+                alert("请输入登录名！");
+                return;
+            }
+            if(password == ""){
+                alert("请输入密码！");
+                return;
+            }
+
+
+    $.ajax({
+
+             	type : "POST",
+             	dataType:"json",
+             	url  : "/checkLogin",
+             	data :$('#form-log').serialize(),
+             	success : function(data){
+             	    if(data.state==200){
+             		    alert("登录成功");
+                        location.href="/web/chat.html";
+             		}
+             		if(data.state==404){
+             		    alert("登录失败");
+             		}
+             	}
+             });
+	}
+</script>
+
+<body>
+<div class="container"><!--该层主要用于设定毛玻璃位置以及对毛玻璃的溢出进行限制，即作为毛玻璃的容器-->
+    <div class="glass"></div><!--该层用于模糊化-->
+    <div class="log">
+        <h3 style="color:white">用户登录</h3>
+        <hr color="#2196F3" size="2px">
+        <br><br>
+        <form id="form-log" role="form">
+            <label style="color:white">&emsp;&emsp;用户名：</label>
+            <input id="username" name="username" type="text" placeholder="   请输入用户名" style="width: 200px;height: 25px">
+            <br><br>
+            <label style="color:white">&emsp;&emsp;密码：&nbsp;&thinsp;&thinsp;&thinsp;</label>
+            <input id="password" name="password" type="text" placeholder="   请输入密码" style="width: 200px;height: 25px">
+            <br><br>
+            <div class="log1">
+                <button id="btn-login" type="button" class="buttoncss" onclick="doLogin()">登 录</button>
+            </div>
+            <div class="log2">
+                <a href="/web/register.html">
+                <button id="btn-register" type="button" class="buttoncss1">注册</button>
+                </a>
+            </div>
+        </form>
+    </div><!--该层是内容层-->
+</div>
+</body>
+</html>

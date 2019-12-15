@@ -1,0 +1,98 @@
+body{
+    background: url("/images/th.jpg") no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+}
+input{
+    outline-style: none ;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    padding: 0px 0px 0px 10px;
+    width: 620px;
+    font-size: 14px;
+    font-family: "Microsoft soft";
+}
+input:focus{
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+}
+button{
+    outline:0;
+}
+button:hover{
+    opacity:0.9;
+}
+button:active{
+    opacity:0.9;
+}
+
+.container{
+    width: 400px;
+    height: 370px;
+    position: absolute;
+    top: calc(50% - 185px);
+    left: calc(50% - 200px);
+    overflow: hidden;
+    border-radius:15px;
+}
+.glass{
+    position: absolute;
+    top: 0;left: 0;right: 0;bottom: 0;
+    background: url("/images/th.jpg") no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+    filter: blur(10px);
+    margin:-30px;
+}
+.log{
+    position: absolute;
+    top: 0;left: 0;right: 0;bottom: 0;
+    padding: 15px;
+}
+.buttoncss{
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 8px 60px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    border-radius:15px;
+}
+.log1{
+      width: 160px;
+      height: 40px;
+      position: absolute;
+      top: 290px;left: 205px;right: 0;bottom: 0;
+}
+
+.buttoncss1{
+    background-color: #F44336; /* Red */
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    border-radius:15px;
+}
+.log2{
+      width: 80px;
+      height: 40px;
+      position: absolute;
+      top: 290px;left: 40px;right: 0;bottom: 0;
+}
+.back{
+    width: 70px;
+    height: 20px;
+    font-size: 15px;
+    color: white;
+    text-decoration:none;
+    position: absolute;
+    top: 38px;left: 310px;right: 0;bottom: 0;
+}
+
