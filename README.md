@@ -10,3 +10,5 @@
 数据库脚本文件 在文件夹lib/mysql里面
 
 Http服务器 用来存放图片和文件 以python创建 批处理在lib/python里面 要先在服务器C盘根目录下创建file文件夹，在此文件夹下创建userfiles和userimages文件夹。
+
+images文件夹为表情包，可覆盖src中同名文件夹
